@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airdrop Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .backdrop-blur-xl {
+            backdrop-filter: blur(24px);
+        }
+        .backdrop-blur-sm {
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-950 via-purple-900 to-indigo-950">
+    <!-- Sidebar -->
+    <div class="fixed left-0 top-0 h-full w-64 bg-black/30 backdrop-blur-xl border-r border-white/10 p-6">
+        <div class="flex items-center space-x-3 mb-8">
+            <div class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center">
+                <span class="text-xl">⚡</span>
+            </div>
+            <span class="text-yellow-500 font-bold text-xl">AIRDROP TRACKER</span>
+        </div>
+
+        <nav class="space-y-2">
+            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg flex items-center space-x-3 transition-colors">
+                <i data-lucide="plus" class="w-5 h-5"></i>
+                <span>Dashboard</span>
+            </button>
+            
+            <button 
+                onclick="setFilterStatus('Todos')"
+                class="w-full hover:bg-white/5 text-gray-300 hover:text-white px-4 py-3 rounded-lg flex items-center space-x-3 transition-colors"
+            >
+                <i data-lucide="activity" class="w-5 h-5"></i>
+                <span>Meus Airdrops</span>
+            </button>
+            
+            <button 
+                onclick="openModal()"
+                class="w-full hover:bg-white/5 text-gray-300 hover:text-white px-4 py-3 rounded-lg flex items-center space-x-3 transition-colors"
+            >
+                <i data-lucide="plus" class="w-5 h-5"></i>
+                <span>Adicionar</span>
+            </button>
+
+            <div class="border-t border-white/10 my-4"></div>
+
+            <button 
+                onclick="exportBackup()"
+                class="w-full hover:bg-white/5 text-gray-300 hover:text-white px-4 py-3 rounded-lg flex items-center space-x-3 transition-colors"
+            >
+                <i data-lucide="download" class="w-5 h-5"></i>
+                <span>Exportar Backup</span>
+            </button>
+            
+            <button 
+                onclick="openImportModal()"
+                class="w-full hover:bg-white/5 text-gray-300 hover:text-white px-4 py-3 rounded-lg flex items-center space-x-3 transition-colors"
+            >
+                <i data-lucide="upload" class="w-5 h-5"></i>
+                <span>Importar Backup</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-64 p-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center space-x-4">
+                <span class="text-gray-400">Hoje</span>
+                <div class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold" id="currentDate">
+                    <!-- Data será inserida via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-gradient-to-br from-orange-500/20 to-red-500/20 backdrop-blur-sm border border-orange-500/30 rounded-xl p-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-300 text-xs">Tarefas Urgentes</p>
+                        <p class="text-2xl font-bold text-white" id="urgentCount">0</p>
+                    </div>
+                    <i data-lucide="clock" class="text-orange-400 w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-blue-500/30 rounded-xl p-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-300 text-xs">Total de Airdrops</p>
+                        <p class="text-2xl font-bold text-white" id="totalCount">0</p>
+                    </div>
+                    <i data-lucide="plus" class="text-blue-400 w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur-sm border border-green-500/30 rounded-xl p-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-300 text-xs">Concluídas Hoje</p>
+                        <p class="text-2xl font-bold text-white" id="completedTodayCount">0</p>
+                    </div>
+                    <i data-lucide="check-circle" class="text-green-400 w-5 h-5"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarefas Concluídas Hoje -->
+        <div class="mb-8" id="completedTodaySection" style="display: none;">
+            <div class="flex items-center mb-4">
+                <i data-lucide="check-circle" class="text-green-400 w-6 h-6 mr-3"></i>
+                <h3 class="text-xl font-bold text-white">Tarefas Concluídas Hoje</h3>
+            </div>
+            <div class="bg-green-500/10 backdrop-blur-sm border border-green-500/30 rounded-xl p-4">
+                <div id="completedTodayList" class="space-y-3">
+                    <!-- Lista de tarefas concluídas hoje será inserida aqui -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex items-center space-x-4 mb-6">
+            <button
+                onclick="setFilterStatus('Todos')"
+                class="px-4 py-2 rounded-lg font-medium transition-all filter-btn active"
+                data-status="Todos"
+            >
+                <i data-lucide="plus" class="inline mr-2 w-4 h-4"></i>
+                Todos
+            </button>
+            <button
+                onclick="setFilterStatus('Ativo')"
+                class="px-4 py-2 rounded-lg font-medium transition-all filter-btn"
+                data-status="Ativo"
+            >
+                <i data-lucide="clock" class="inline mr-2 w-4 h-4"></i>
+                Ativos
+            </button>
+            <button
+                onclick="setFilterStatus('Concluído')"
+                class="px-4 py-2 rounded-lg font-medium transition-all filter-btn"
+                data-status="Concluído"
+            >
+                <i data-lucide="check-circle" class="inline mr-2 w-4 h-4"></i>
+                Concluídos
+            </button>
+        </div>
+
+        <!-- Title and Add Button -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-white flex items-center">
+                    <i data-lucide="activity" class="mr-3 text-yellow-500 w-6 h-6"></i>
+                    Suas Tarefas Diárias
+                </h2>
+                <p class="text-gray-400 mt-1">Estas são suas tarefas atuais que precisam ser completadas</p>
+            </div>
+            <button
+                onclick="openModal()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+            >
+                <span>Adicionar Airdrop</span>
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
+            <table class="w-full">
+                            <thead>
+                <tr class="border-b border-white/10">
+                    <th class="text-left p-6 text-gray-400 font-medium">Concluída Hoje</th>
+                    <th class="text-left p-6 text-gray-400 font-medium">Projeto</th>
+                    <th class="text-left p-6 text-gray-400 font-medium">Tarefa</th>
+                    <th class="text-center p-6 text-gray-400 font-medium">Status</th>
+                    <th class="text-center p-6 text-gray-400 font-medium">Financiamento</th>
+                    <th class="text-center p-6 text-gray-400 font-medium">Prioridade</th>
+                    <th class="text-center p-6 text-gray-400 font-medium">Ações</th>
+                </tr>
+            </thead>
+                <tbody id="airdropsTableBody">
+                    <!-- Dados serão inseridos via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gradient-to-br from-purple-900/90 to-indigo-900/90 backdrop-blur-xl border border-white/10 rounded-2xl max-w-2xl w-full">
+            <div class="p-6 border-b border-white/10">
+                <h2 class="text-xl font-semibold text-white" id="modalTitle">
+                    Novo Airdrop
+                </h2>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <form id="airdropForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Nome do projeto</label>
+                            <input
+                                type="text"
+                                required
+                                id="nome"
+                                class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Tipo</label>
+                            <select
+                                id="tipo"
+                                class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                            >
+                                <option value="Grátis">Grátis</option>
+                                <option value="Pago">Pago</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Financiamento</label>
+                            <input
+                                type="text"
+                                id="financiamento"
+                                placeholder="ex: $142M ou Indisponível"
+                                class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Expectativa</label>
+                            <select
+                                id="expectativa"
+                                class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                            >
+                                <option value="Alta">Alta</option>
+                                <option value="Média">Média</option>
+                                <option value="Baixa">Baixa</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Rede</label>
+                            <input
+                                type="text"
+                                id="rede"
+                                placeholder="ex: EVM, Cosmos, Arbitrum"
+                                class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Categoria</label>
+                            <input
+                                type="text"
+                                id="categoria"
+                                placeholder="ex: Layer 1, DeFi, Gaming"
+                                class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">URL</label>
+                            <input
+                                type="text"
+                                id="url"
+                                placeholder="ex: app.exemplo.com"
+                                class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Status</label>
+                            <select
+                                id="status"
+                                class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                            >
+                                <option value="Ativo">Ativo</option>
+                                <option value="Concluído">Concluído</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Prioridade</label>
+                            <select
+                                id="prioridade"
+                                class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                            >
+                                <option value="Alta">Alta</option>
+                                <option value="Média">Média</option>
+                                <option value="Baixa">Baixa</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Descrição</label>
+                        <textarea
+                            id="description"
+                            rows="2"
+                            placeholder="Descrição do projeto..."
+                            class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                        ></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Tarefa</label>
+                        <textarea
+                            id="tarefa"
+                            rows="3"
+                            placeholder="Descreva as tarefas necessárias para participar do airdrop..."
+                            class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                        ></textarea>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button
+                            type="button"
+                            onclick="closeModal()"
+                            class="px-6 py-3 border border-white/20 text-gray-300 rounded-lg hover:bg-white/10 transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                            Adicionar Airdrop
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gradient-to-br from-purple-900/90 to-indigo-900/90 backdrop-blur-xl border border-white/10 rounded-2xl max-w-4xl w-full">
+            <div class="relative">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-t-2xl">
+                    <button
+                        onclick="closeDetailModal()"
+                        class="absolute top-4 right-4 text-white hover:bg-white/20 rounded-lg p-2 transition-colors"
+                    >
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-white font-bold text-2xl" id="detailIcon">
+                            <!-- Ícone será inserido via JavaScript -->
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-white" id="detailNome"></h2>
+                            <p class="text-blue-100" id="detailUrl"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6">
+                    <!-- Quick Info Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                            <div class="text-sm text-gray-400 mb-1">Status</div>
+                            <span id="detailStatus" class="inline-flex px-3 py-1 rounded-full text-sm font-medium border">
+                                <!-- Status será inserido via JavaScript -->
+                            </span>
+                        </div>
+                        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                            <div class="text-sm text-gray-400 mb-1">Tipo</div>
+                            <span class="text-white font-medium" id="detailTipo"></span>
+                        </div>
+                        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                            <div class="text-sm text-gray-400 mb-1">Expectativa</div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-2xl" id="detailExpectativaEmoji">⭐</span>
+                                <span class="text-white font-medium" id="detailExpectativa"></span>
+                            </div>
+                        </div>
+                        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                            <div class="text-sm text-gray-400 mb-1">Financiamento</div>
+                            <div class="text-lg font-semibold text-white" id="detailFinanciamento"></div>
+                        </div>
+                    </div>
+
+                    <!-- Details Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h3 class="text-lg font-semibold text-white mb-3">Informações Técnicas</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Rede:</span>
+                                    <span class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-sm font-medium" id="detailRede"></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Categoria:</span>
+                                    <span class="bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full text-sm font-medium" id="detailCategoria"></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400">Prioridade:</span>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-2 h-2 rounded-full" id="detailPrioridadeDot"></div>
+                                        <span class="text-white" id="detailPrioridade"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white mb-3">Acesso Rápido</h3>
+                            <button
+                                id="visitSiteBtn"
+                                class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2"
+                            >
+                                <i data-lucide="external-link" class="w-5 h-5"></i>
+                                <span>Visitar Site do Projeto</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-6" id="descriptionSection">
+                        <h3 class="text-lg font-semibold text-white mb-3">Descrição do Projeto</h3>
+                        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                            <p class="text-gray-300 leading-relaxed" id="detailDescription"></p>
+                        </div>
+                    </div>
+
+                    <!-- Tasks -->
+                    <div class="mb-6" id="tasksSection">
+                        <h3 class="text-lg font-semibold text-white mb-3">📋 Tarefas para Participar</h3>
+                        <div class="bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm border border-blue-500/30 rounded-xl p-4">
+                            <p class="text-gray-300 leading-relaxed" id="detailTarefa"></p>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end space-x-3 pt-6 border-t border-white/10">
+                        <button
+                            onclick="closeDetailModal()"
+                            class="px-6 py-2 border border-white/20 text-gray-300 rounded-lg hover:bg-white/10 transition-colors"
+                        >
+                            Fechar
+                        </button>
+                        <button
+                            id="editDetailBtn"
+                            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center space-x-2"
+                        >
+                            <i data-lucide="edit-2" class="w-4 h-4"></i>
+                            <span>Editar Airdrop</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="importModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gradient-to-br from-purple-900/90 to-indigo-900/90 backdrop-blur-xl border border-white/10 rounded-2xl max-w-md w-full">
+            <div class="p-6 border-b border-white/10">
+                <h2 class="text-xl font-semibold text-white">Importar Backup</h2>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="upload" class="text-blue-400 w-8 h-8"></i>
+                    </div>
+                    <p class="text-gray-300 mb-4">Selecione um arquivo de backup (.json) para importar seus dados</p>
+                    
+                    <label class="block w-full">
+                        <input 
+                            type="file" 
+                            id="importFile" 
+                            accept=".json"
+                            class="hidden"
+                            onchange="handleFileSelect(event)"
+                        >
+                        <div class="w-full p-4 border-2 border-dashed border-white/20 rounded-lg text-center cursor-pointer hover:border-blue-500 transition-colors">
+                            <i data-lucide="file" class="text-gray-400 w-6 h-6 mx-auto mb-2"></i>
+                            <span class="text-gray-300">Clique para selecionar arquivo</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div id="importPreview" class="hidden">
+                    <div class="bg-white/5 rounded-lg p-4">
+                        <h3 class="text-white font-medium mb-2">Preview dos dados:</h3>
+                        <div id="importPreviewContent" class="text-gray-300 text-sm"></div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button
+                        type="button"
+                        onclick="closeImportModal()"
+                        class="px-6 py-3 border border-white/20 text-gray-300 rounded-lg hover:bg-white/10 transition-colors"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="button"
+                        id="importButton"
+                        onclick="importBackup()"
+                        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors hidden"
+                    >
+                        Importar Dados
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados iniciais
+        let airdrops = [
+            {
+                id: 1,
+                nome: 'LayerZero',
+                tipo: 'Grátis',
+                financiamento: '$135M',
+                expectativa: 'Alta',
+                rede: 'Multi-chain',
+                categoria: 'DeFi',
+                url: 'layerzero.network',
+                status: 'Ativo',
+                description: 'Protocolo de interoperabilidade omnichain',
+                tarefa: 'Bridge entre redes, usar Stargate Finance',
+                prioridade: 'Alta',
+                concluidoHoje: false,
+                dataConclusao: null
+            },
+            {
+                id: 2,
+                nome: 'Arbitrum Odyssey',
+                tipo: 'Grátis',
+                financiamento: '$120M',
+                expectativa: 'Média',
+                rede: 'Arbitrum',
+                categoria: 'Layer 2',
+                url: 'arbitrum.io',
+                status: 'Ativo',
+                description: 'Programa de recompensas Arbitrum',
+                tarefa: 'Complete 3 transactions',
+                prioridade: 'Média',
+                concluidoHoje: false,
+                dataConclusao: null
+            },
+            {
+                id: 3,
+                nome: 'Optimism Quest',
+                tipo: 'Grátis',
+                financiamento: '$178M',
+                expectativa: 'Alta',
+                rede: 'Optimism',
+                categoria: 'NFT',
+                url: 'optimism.io',
+                status: 'Concluído',
+                description: 'Layer 2 Ethereum scaling solution',
+                tarefa: 'Mint NFT collection',
+                prioridade: 'Alta',
+                concluidoHoje: false,
+                dataConclusao: null
+            },
+            {
+                id: 4,
+                nome: 'Polygon zkEVM',
+                tipo: 'Grátis',
+                financiamento: '$450M',
+                expectativa: 'Baixa',
+                rede: 'Polygon',
+                categoria: 'Staking',
+                url: 'polygon.technology',
+                status: 'Ativo',
+                description: 'zkEVM Layer 2',
+                tarefa: 'Stake tokens',
+                prioridade: 'Baixa',
+                concluidoHoje: false,
+                dataConclusao: null
+            }
+        ];
+
+        let editingAirdrop = null;
+        let filterStatus = 'Todos';
+        let selectedAirdrop = null;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar ícones Lucide
+            lucide.createIcons();
+            
+            // Configurar data atual
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric' 
+            });
+            
+            // Renderizar tabela inicial
+            renderTable();
+            updateStats();
+            renderCompletedTodaySection();
+            
+            // Configurar formulário
+            document.getElementById('airdropForm').addEventListener('submit', handleSubmit);
+        });
+
+        // Funções auxiliares
+        function getStatusColor(status) {
+            switch (status) {
+                case 'Concluído': return 'text-green-400';
+                case 'Ativo': return 'text-blue-400';
+                default: return 'text-gray-400';
+            }
+        }
+
+        function getStatusBg(status) {
+            switch (status) {
+                case 'Concluído': return 'bg-green-500/20 text-green-400 border-green-500/30';
+                case 'Ativo': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+                default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+            }
+        }
+
+        function getPrioridadeColor(prioridade) {
+            switch (prioridade) {
+                case 'Alta': return 'bg-red-500';
+                case 'Média': return 'bg-yellow-500';
+                case 'Baixa': return 'bg-green-500';
+                default: return 'bg-gray-500';
+            }
+        }
+
+        function getExpectativaEmoji(expectativa) {
+            switch (expectativa) {
+                case 'Alta': return '⭐';
+                case 'Média': return '⭐';
+                case 'Baixa': return '⭐';
+                default: return '';
+            }
+        }
+
+        // Funções de filtro
+        function setFilterStatus(status) {
+            filterStatus = status;
+            
+            // Atualizar botões de filtro
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-white/10', 'text-gray-300');
+            });
+            
+            const activeBtn = document.querySelector(`[data-status="${status}"]`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white/10', 'text-gray-300');
+                activeBtn.classList.add('bg-blue-600', 'text-white');
+            }
+            
+            renderTable();
+        }
+
+        // Funções de modal
+        function openModal(airdrop = null) {
+            editingAirdrop = airdrop;
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const submitBtn = modal.querySelector('button[type="submit"]');
+            
+            if (airdrop) {
+                title.textContent = 'Editar Airdrop';
+                submitBtn.textContent = 'Salvar Alterações';
+                fillForm(airdrop);
+            } else {
+                title.textContent = 'Novo Airdrop';
+                submitBtn.textContent = 'Adicionar Airdrop';
+                resetForm();
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            editingAirdrop = null;
+            resetForm();
+        }
+
+        function resetForm() {
+            const form = document.getElementById('airdropForm');
+            form.reset();
+        }
+
+        function fillForm(airdrop) {
+            document.getElementById('nome').value = airdrop.nome;
+            document.getElementById('tipo').value = airdrop.tipo;
+            document.getElementById('financiamento').value = airdrop.financiamento;
+            document.getElementById('expectativa').value = airdrop.expectativa;
+            document.getElementById('rede').value = airdrop.rede;
+            document.getElementById('categoria').value = airdrop.categoria;
+            document.getElementById('url').value = airdrop.url;
+            document.getElementById('status').value = airdrop.status;
+            document.getElementById('description').value = airdrop.description;
+            document.getElementById('tarefa').value = airdrop.tarefa;
+            document.getElementById('prioridade').value = airdrop.prioridade;
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                nome: document.getElementById('nome').value,
+                tipo: document.getElementById('tipo').value,
+                financiamento: document.getElementById('financiamento').value,
+                expectativa: document.getElementById('expectativa').value,
+                rede: document.getElementById('rede').value,
+                categoria: document.getElementById('categoria').value,
+                url: document.getElementById('url').value,
+                status: document.getElementById('status').value,
+                description: document.getElementById('description').value,
+                tarefa: document.getElementById('tarefa').value,
+                prioridade: document.getElementById('prioridade').value,
+                concluidoHoje: editingAirdrop ? editingAirdrop.concluidoHoje : false,
+                dataConclusao: editingAirdrop ? editingAirdrop.dataConclusao : null
+            };
+            
+            if (editingAirdrop) {
+                // Editar airdrop existente
+                airdrops = airdrops.map(a => a.id === editingAirdrop.id ? { ...formData, id: editingAirdrop.id } : a);
+            } else {
+                // Adicionar novo airdrop
+                airdrops.push({ ...formData, id: Date.now() });
+            }
+            
+            closeModal();
+            renderTable();
+            updateStats();
+            renderCompletedTodaySection();
+        }
+
+        function deleteAirdrop(id) {
+            if (confirm('Tem certeza que deseja excluir este airdrop?')) {
+                airdrops = airdrops.filter(a => a.id !== id);
+                renderTable();
+                updateStats();
+                renderCompletedTodaySection();
+            }
+        }
+
+        // Funções de modal de detalhes
+        function openDetailModal(airdrop) {
+            selectedAirdrop = airdrop;
+            
+            // Preencher dados do modal
+            document.getElementById('detailIcon').textContent = airdrop.nome.substring(0, 2).toUpperCase();
+            document.getElementById('detailNome').textContent = airdrop.nome;
+            document.getElementById('detailUrl').textContent = airdrop.url;
+            document.getElementById('detailStatus').textContent = airdrop.status;
+            document.getElementById('detailStatus').className = `inline-flex px-3 py-1 rounded-full text-sm font-medium border ${getStatusBg(airdrop.status)}`;
+            document.getElementById('detailTipo').textContent = airdrop.tipo;
+            document.getElementById('detailExpectativa').textContent = airdrop.expectativa;
+            document.getElementById('detailExpectativaEmoji').textContent = getExpectativaEmoji(airdrop.expectativa);
+            document.getElementById('detailFinanciamento').textContent = airdrop.financiamento;
+            document.getElementById('detailRede').textContent = airdrop.rede;
+            document.getElementById('detailCategoria').textContent = airdrop.categoria;
+            document.getElementById('detailPrioridade').textContent = airdrop.prioridade;
+            document.getElementById('detailPrioridadeDot').className = `w-2 h-2 rounded-full ${getPrioridadeColor(airdrop.prioridade)}`;
+            document.getElementById('detailDescription').textContent = airdrop.description;
+            document.getElementById('detailTarefa').textContent = airdrop.tarefa;
+            
+            // Configurar botão de visitar site
+            document.getElementById('visitSiteBtn').onclick = () => window.open(`https://${airdrop.url}`, '_blank');
+            
+            // Configurar botão de editar
+            document.getElementById('editDetailBtn').onclick = () => {
+                closeDetailModal();
+                openModal(airdrop);
+            };
+            
+            // Mostrar/ocultar seções baseado no conteúdo
+            document.getElementById('descriptionSection').style.display = airdrop.description ? 'block' : 'none';
+            document.getElementById('tasksSection').style.display = airdrop.tarefa ? 'block' : 'none';
+            
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+            selectedAirdrop = null;
+        }
+
+        // Funções de renderização
+        function renderTable() {
+            const tbody = document.getElementById('airdropsTableBody');
+            const filteredAirdrops = airdrops.filter(airdrop => {
+                const matchesStatus = filterStatus === 'Todos' || airdrop.status === filterStatus;
+                return matchesStatus;
+            });
+            
+            tbody.innerHTML = filteredAirdrops.map(airdrop => `
+                <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td class="p-6 text-center">
+                        <label class="flex items-center justify-center cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                class="w-5 h-5 text-green-500 bg-white/10 border-white/20 rounded focus:ring-green-500 focus:ring-2"
+                                ${airdrop.concluidoHoje ? 'checked' : ''}
+                                onchange="toggleCompletedToday(${airdrop.id}, this.checked)"
+                            >
+                        </label>
+                    </td>
+                    <td class="p-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold">
+                                ${airdrop.nome.substring(0, 2).toUpperCase()}
+                            </div>
+                            <div>
+                                <p class="text-white font-semibold">${airdrop.nome}</p>
+                                <p class="text-gray-400 text-sm">${airdrop.categoria}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-6">
+                        <p class="text-gray-300">${airdrop.tarefa}</p>
+                        <p class="text-gray-500 text-sm mt-1">Deadline: ${new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR')}</p>
+                    </td>
+                    <td class="p-6 text-center">
+                        <span class="inline-flex px-3 py-1 rounded-full text-sm font-medium border ${getStatusBg(airdrop.status)}">
+                            ${airdrop.status}
+                        </span>
+                    </td>
+                    <td class="p-6 text-center">
+                        <div class="text-white font-semibold">${airdrop.financiamento}</div>
+                        <div class="text-gray-400 text-xs mt-1">${airdrop.expectativa}</div>
+                    </td>
+                    <td class="p-6 text-center">
+                        <div class="flex items-center justify-center space-x-2">
+                            <div class="w-2 h-2 rounded-full ${getPrioridadeColor(airdrop.prioridade)}"></div>
+                            <span class="text-gray-300 text-sm">${airdrop.prioridade}</span>
+                        </div>
+                    </td>
+                    <td class="p-6">
+                        <div class="flex items-center justify-center space-x-2">
+                            <button
+                                onclick="openDetailModal(${JSON.stringify(airdrop).replace(/"/g, '&quot;')})"
+                                class="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"
+                            >
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                            <button
+                                onclick="window.open('https://${airdrop.url}', '_blank')"
+                                class="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"
+                            >
+                                <i data-lucide="external-link" class="w-4 h-4"></i>
+                            </button>
+                            <button
+                                onclick="openModal(${JSON.stringify(airdrop).replace(/"/g, '&quot;')})"
+                                class="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"
+                            >
+                                <i data-lucide="edit-2" class="w-4 h-4"></i>
+                            </button>
+                            <button
+                                onclick="deleteAirdrop(${airdrop.id})"
+                                class="p-2 hover:bg-white/10 rounded-lg transition-colors text-red-400 hover:text-red-300"
+                            >
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Reinicializar ícones
+            lucide.createIcons();
+        }
+
+        function toggleCompletedToday(id, checked) {
+            const airdrop = airdrops.find(a => a.id === id);
+            if (airdrop) {
+                airdrop.concluidoHoje = checked;
+                if (checked) {
+                    airdrop.dataConclusao = new Date().toISOString();
+                } else {
+                    airdrop.dataConclusao = null;
+                }
+                updateStats();
+                renderCompletedTodaySection();
+            }
+        }
+
+        function renderCompletedTodaySection() {
+            const completedToday = airdrops.filter(a => a.concluidoHoje);
+            const section = document.getElementById('completedTodaySection');
+            const list = document.getElementById('completedTodayList');
+            
+            if (completedToday.length > 0) {
+                section.style.display = 'block';
+                list.innerHTML = completedToday.map(airdrop => `
+                    <div class="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                                ${airdrop.nome.substring(0, 2).toUpperCase()}
+                            </div>
+                            <div>
+                                <p class="text-white font-medium">${airdrop.nome}</p>
+                                <p class="text-green-300 text-sm">${airdrop.tarefa}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-300 text-sm">
+                                ${airdrop.dataConclusao ? new Date(airdrop.dataConclusao).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}) : ''}
+                            </span>
+                            <button
+                                onclick="toggleCompletedToday(${airdrop.id}, false)"
+                                class="text-red-400 hover:text-red-300 p-1"
+                                title="Desmarcar como concluída"
+                            >
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                section.style.display = 'none';
+            }
+            
+            // Reinicializar ícones
+            lucide.createIcons();
+        }
+
+        function updateStats() {
+            const activeCount = airdrops.filter(a => a.status === 'Ativo').length;
+            const completedCount = airdrops.filter(a => a.status === 'Concluído').length;
+            const urgentCount = airdrops.filter(a => a.prioridade === 'Alta' && a.status === 'Ativo').length;
+            const completedTodayCount = airdrops.filter(a => a.concluidoHoje).length;
+            
+            document.getElementById('totalCount').textContent = airdrops.length;
+            document.getElementById('urgentCount').textContent = urgentCount;
+            document.getElementById('completedTodayCount').textContent = completedTodayCount;
+        }
+
+        // Funções de Backup e Importação
+        function exportBackup() {
+            const backupData = {
+                airdrops: airdrops,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const dataStr = JSON.stringify(backupData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `airdrop-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            // Mostrar notificação de sucesso
+            showNotification('Backup exportado com sucesso!', 'success');
+        }
+
+        function openImportModal() {
+            document.getElementById('importModal').classList.remove('hidden');
+            document.getElementById('importPreview').classList.add('hidden');
+            document.getElementById('importButton').classList.add('hidden');
+            document.getElementById('importFile').value = '';
+            lucide.createIcons();
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.add('hidden');
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Validar estrutura do arquivo
+                    if (!data.airdrops || !Array.isArray(data.airdrops)) {
+                        throw new Error('Arquivo inválido: estrutura de dados incorreta');
+                    }
+
+                    // Mostrar preview
+                    const preview = document.getElementById('importPreview');
+                    const previewContent = document.getElementById('importPreviewContent');
+                    const importButton = document.getElementById('importButton');
+                    
+                    previewContent.innerHTML = `
+                        <div class="space-y-2">
+                            <div><strong>Total de airdrops:</strong> ${data.airdrops.length}</div>
+                            <div><strong>Data do backup:</strong> ${data.exportDate ? new Date(data.exportDate).toLocaleString('pt-BR') : 'Não informada'}</div>
+                            <div><strong>Versão:</strong> ${data.version || '1.0'}</div>
+                        </div>
+                    `;
+                    
+                    preview.classList.remove('hidden');
+                    importButton.classList.remove('hidden');
+                    
+                    // Armazenar dados temporariamente
+                    window.tempImportData = data;
+                    
+                } catch (error) {
+                    showNotification('Erro ao ler arquivo: ' + error.message, 'error');
+                    document.getElementById('importPreview').classList.add('hidden');
+                    document.getElementById('importButton').classList.add('hidden');
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function importBackup() {
+            if (!window.tempImportData) {
+                showNotification('Nenhum arquivo selecionado', 'error');
+                return;
+            }
+
+            // Confirmar importação
+            if (!confirm('Tem certeza que deseja importar estes dados? Isso substituirá todos os dados atuais.')) {
+                return;
+            }
+
+            try {
+                // Importar dados
+                airdrops = window.tempImportData.airdrops;
+                
+                // Limpar dados temporários
+                delete window.tempImportData;
+                
+                // Fechar modal
+                closeImportModal();
+                
+                // Atualizar interface
+                renderTable();
+                updateStats();
+                renderCompletedTodaySection();
+                
+                showNotification('Dados importados com sucesso!', 'success');
+                
+            } catch (error) {
+                showNotification('Erro ao importar dados: ' + error.message, 'error');
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            // Criar elemento de notificação
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white font-medium z-50 transition-all duration-300 transform translate-x-full`;
+            
+            // Definir cor baseada no tipo
+            if (type === 'success') {
+                notification.className += ' bg-green-600';
+            } else if (type === 'error') {
+                notification.className += ' bg-red-600';
+            } else {
+                notification.className += ' bg-blue-600';
+            }
+            
+            notification.textContent = message;
+            
+            // Adicionar ao DOM
+            document.body.appendChild(notification);
+            
+            // Animar entrada
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Remover após 3 segundos
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html> 
