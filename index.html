@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -19,48 +20,61 @@
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-purple-950 via-purple-900 to-indigo-950">
+    <!-- Mobile Header -->
+    <div id="mobile-header" class="fixed top-0 left-0 right-0 bg-black/30 backdrop-blur-xl border-b border-white/10 p-4 flex items-center justify-between z-40 md:hidden">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
+                <span class="text-lg">⚡</span>
+            </div>
+            <span class="text-yellow-500 font-bold text-lg">AIRDROP TRACKER</span>
+        </div>
+        <button onclick="toggleSidebar()" class="text-white">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+    </div>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 hidden md:hidden z-30" onclick="toggleSidebar()"></div>
+
     <!-- Sidebar -->
-    <div class="fixed left-0 top-0 h-full w-64 bg-black/30 backdrop-blur-xl border-r border-white/10 p-6">
+    <div id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-black/30 backdrop-blur-xl border-r border-white/10 p-6 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50">
         <div class="flex items-center space-x-3 mb-8">
             <div class="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center">
                 <span class="text-xl">⚡</span>
             </div>
             <span class="text-yellow-500 font-bold text-xl">AIRDROP TRACKER</span>
         </div>
-
         <nav class="space-y-2">
             <button class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg flex items-center space-x-3 transition-colors">
                 <i data-lucide="plus" class="w-5 h-5"></i>
                 <span>Dashboard</span>
             </button>
-            
-            <button 
+           
+            <button
                 onclick="setFilterStatus('Todos')"
                 class="w-full hover:bg-white/5 text-gray-300 hover:text-white px-4 py-3 rounded-lg flex items-center space-x-3 transition-colors"
             >
                 <i data-lucide="activity" class="w-5 h-5"></i>
                 <span>Meus Airdrops</span>
             </button>
-            
-            <button 
+           
+            <button
                 onclick="openModal()"
                 class="w-full hover:bg-white/5 text-gray-300 hover:text-white px-4 py-3 rounded-lg flex items-center space-x-3 transition-colors"
             >
                 <i data-lucide="plus" class="w-5 h-5"></i>
                 <span>Adicionar</span>
             </button>
-
             <div class="border-t border-white/10 my-4"></div>
-
-            <button 
+            <button
                 onclick="exportBackup()"
                 class="w-full hover:bg-white/5 text-gray-300 hover:text-white px-4 py-3 rounded-lg flex items-center space-x-3 transition-colors"
             >
                 <i data-lucide="download" class="w-5 h-5"></i>
                 <span>Exportar Backup</span>
             </button>
-            
-            <button 
+           
+            <button
                 onclick="openImportModal()"
                 class="w-full hover:bg-white/5 text-gray-300 hover:text-white px-4 py-3 rounded-lg flex items-center space-x-3 transition-colors"
             >
@@ -69,9 +83,8 @@
             </button>
         </nav>
     </div>
-
     <!-- Main Content -->
-    <div class="ml-64 p-8">
+    <div class="pt-16 md:pt-0 md:ml-64 p-8">
         <!-- Header -->
         <div class="flex justify-between items-center mb-8">
             <div class="flex items-center space-x-4">
@@ -81,7 +94,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="bg-gradient-to-br from-orange-500/20 to-red-500/20 backdrop-blur-sm border border-orange-500/30 rounded-xl p-4">
@@ -93,7 +105,6 @@
                     <i data-lucide="clock" class="text-orange-400 w-5 h-5"></i>
                 </div>
             </div>
-
             <div class="bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-blue-500/30 rounded-xl p-4">
                 <div class="flex justify-between items-center">
                     <div>
@@ -103,7 +114,6 @@
                     <i data-lucide="plus" class="text-blue-400 w-5 h-5"></i>
                 </div>
             </div>
-
             <div class="bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur-sm border border-green-500/30 rounded-xl p-4">
                 <div class="flex justify-between items-center">
                     <div>
@@ -114,7 +124,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Tarefas Concluídas Hoje -->
         <div class="mb-8" id="completedTodaySection" style="display: none;">
             <div class="flex items-center mb-4">
@@ -127,9 +136,8 @@
                 </div>
             </div>
         </div>
-
         <!-- Filters -->
-        <div class="flex items-center space-x-4 mb-6">
+        <div class="flex items-center space-x-4 mb-6 flex-wrap gap-y-2">
             <button
                 onclick="setFilterStatus('Todos')"
                 class="px-4 py-2 rounded-lg font-medium transition-all filter-btn active"
@@ -155,9 +163,8 @@
                 Concluídos
             </button>
         </div>
-
         <!-- Title and Add Button -->
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center mb-6 flex-wrap gap-y-4">
             <div>
                 <h2 class="text-2xl font-bold text-white flex items-center">
                     <i data-lucide="activity" class="mr-3 text-yellow-500 w-6 h-6"></i>
@@ -172,11 +179,10 @@
                 <span>Adicionar Airdrop</span>
             </button>
         </div>
-
         <!-- Table -->
-        <div class="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
-            <table class="w-full">
-                            <thead>
+        <div class="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden overflow-x-auto">
+            <table class="w-full min-w-[800px]">
+                <thead>
                 <tr class="border-b border-white/10">
                     <th class="text-left p-6 text-gray-400 font-medium">Concluída Hoje</th>
                     <th class="text-left p-6 text-gray-400 font-medium">Projeto</th>
@@ -193,7 +199,6 @@
             </table>
         </div>
     </div>
-
     <!-- Modal -->
     <div id="modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-gradient-to-br from-purple-900/90 to-indigo-900/90 backdrop-blur-xl border border-white/10 rounded-2xl max-w-2xl w-full">
@@ -202,7 +207,7 @@
                     Novo Airdrop
                 </h2>
             </div>
-            
+           
             <div class="p-6 space-y-4">
                 <form id="airdropForm">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -215,7 +220,7 @@
                                 class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                             />
                         </div>
-                        
+                       
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Tipo</label>
                             <select
@@ -226,7 +231,6 @@
                                 <option value="Pago">Pago</option>
                             </select>
                         </div>
-
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Financiamento</label>
                             <input
@@ -236,7 +240,6 @@
                                 class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                             />
                         </div>
-
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Expectativa</label>
                             <select
@@ -248,7 +251,6 @@
                                 <option value="Baixa">Baixa</option>
                             </select>
                         </div>
-
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Rede</label>
                             <input
@@ -258,7 +260,6 @@
                                 class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                             />
                         </div>
-
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Categoria</label>
                             <input
@@ -268,7 +269,6 @@
                                 class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                             />
                         </div>
-
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">URL</label>
                             <input
@@ -278,7 +278,6 @@
                                 class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                             />
                         </div>
-
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Status</label>
                             <select
@@ -289,7 +288,6 @@
                                 <option value="Concluído">Concluído</option>
                             </select>
                         </div>
-
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-1">Prioridade</label>
                             <select
@@ -302,7 +300,6 @@
                             </select>
                         </div>
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1">Descrição</label>
                         <textarea
@@ -312,7 +309,6 @@
                             class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                         ></textarea>
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1">Tarefa</label>
                         <textarea
@@ -322,7 +318,6 @@
                             class="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                         ></textarea>
                     </div>
-
                     <div class="flex justify-end space-x-3 pt-4">
                         <button
                             type="button"
@@ -342,7 +337,6 @@
             </div>
         </div>
     </div>
-
     <!-- Detail Modal -->
     <div id="detailModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-gradient-to-br from-purple-900/90 to-indigo-900/90 backdrop-blur-xl border border-white/10 rounded-2xl max-w-4xl w-full">
@@ -355,7 +349,7 @@
                     >
                         <i data-lucide="x" class="w-6 h-6"></i>
                     </button>
-                    
+                   
                     <div class="flex items-center space-x-4">
                         <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-white font-bold text-2xl" id="detailIcon">
                             <!-- Ícone será inserido via JavaScript -->
@@ -366,7 +360,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Content -->
                 <div class="p-6">
                     <!-- Quick Info Grid -->
@@ -393,7 +386,6 @@
                             <div class="text-lg font-semibold text-white" id="detailFinanciamento"></div>
                         </div>
                     </div>
-
                     <!-- Details Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
@@ -427,7 +419,6 @@
                             </button>
                         </div>
                     </div>
-
                     <!-- Description -->
                     <div class="mb-6" id="descriptionSection">
                         <h3 class="text-lg font-semibold text-white mb-3">Descrição do Projeto</h3>
@@ -435,7 +426,6 @@
                             <p class="text-gray-300 leading-relaxed" id="detailDescription"></p>
                         </div>
                     </div>
-
                     <!-- Tasks -->
                     <div class="mb-6" id="tasksSection">
                         <h3 class="text-lg font-semibold text-white mb-3">📋 Tarefas para Participar</h3>
@@ -443,7 +433,6 @@
                             <p class="text-gray-300 leading-relaxed" id="detailTarefa"></p>
                         </div>
                     </div>
-
                     <!-- Action Buttons -->
                     <div class="flex justify-end space-x-3 pt-6 border-t border-white/10">
                         <button
@@ -464,25 +453,24 @@
             </div>
         </div>
     </div>
-
     <!-- Import Modal -->
     <div id="importModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-gradient-to-br from-purple-900/90 to-indigo-900/90 backdrop-blur-xl border border-white/10 rounded-2xl max-w-md w-full">
             <div class="p-6 border-b border-white/10">
                 <h2 class="text-xl font-semibold text-white">Importar Backup</h2>
             </div>
-            
+           
             <div class="p-6 space-y-4">
                 <div class="text-center">
                     <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i data-lucide="upload" class="text-blue-400 w-8 h-8"></i>
                     </div>
                     <p class="text-gray-300 mb-4">Selecione um arquivo de backup (.json) para importar seus dados</p>
-                    
+                   
                     <label class="block w-full">
-                        <input 
-                            type="file" 
-                            id="importFile" 
+                        <input
+                            type="file"
+                            id="importFile"
                             accept=".json"
                             class="hidden"
                             onchange="handleFileSelect(event)"
@@ -493,14 +481,12 @@
                         </div>
                     </label>
                 </div>
-
                 <div id="importPreview" class="hidden">
                     <div class="bg-white/5 rounded-lg p-4">
                         <h3 class="text-white font-medium mb-2">Preview dos dados:</h3>
                         <div id="importPreviewContent" class="text-gray-300 text-sm"></div>
                     </div>
                 </div>
-
                 <div class="flex justify-end space-x-3 pt-4">
                     <button
                         type="button"
@@ -521,7 +507,6 @@
             </div>
         </div>
     </div>
-
     <script>
         // Dados iniciais
         let airdrops = [
@@ -590,32 +575,36 @@
                 dataConclusao: null
             }
         ];
-
         let editingAirdrop = null;
         let filterStatus = 'Todos';
         let selectedAirdrop = null;
-
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
             // Inicializar ícones Lucide
             lucide.createIcons();
-            
+           
             // Configurar data atual
-            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR', { 
-                day: '2-digit', 
-                month: '2-digit', 
-                year: 'numeric' 
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
             });
-            
+           
             // Renderizar tabela inicial
             renderTable();
             updateStats();
             renderCompletedTodaySection();
-            
+           
             // Configurar formulário
             document.getElementById('airdropForm').addEventListener('submit', handleSubmit);
         });
-
+        // Função para toggle da sidebar no mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
         // Funções auxiliares
         function getStatusColor(status) {
             switch (status) {
@@ -624,7 +613,6 @@
                 default: return 'text-gray-400';
             }
         }
-
         function getStatusBg(status) {
             switch (status) {
                 case 'Concluído': return 'bg-green-500/20 text-green-400 border-green-500/30';
@@ -632,7 +620,6 @@
                 default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
             }
         }
-
         function getPrioridadeColor(prioridade) {
             switch (prioridade) {
                 case 'Alta': return 'bg-red-500';
@@ -641,7 +628,6 @@
                 default: return 'bg-gray-500';
             }
         }
-
         function getExpectativaEmoji(expectativa) {
             switch (expectativa) {
                 case 'Alta': return '⭐';
@@ -650,33 +636,31 @@
                 default: return '';
             }
         }
-
         // Funções de filtro
         function setFilterStatus(status) {
             filterStatus = status;
-            
+           
             // Atualizar botões de filtro
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('bg-blue-600', 'text-white');
                 btn.classList.add('bg-white/10', 'text-gray-300');
             });
-            
+           
             const activeBtn = document.querySelector(`[data-status="${status}"]`);
             if (activeBtn) {
                 activeBtn.classList.remove('bg-white/10', 'text-gray-300');
                 activeBtn.classList.add('bg-blue-600', 'text-white');
             }
-            
+           
             renderTable();
         }
-
         // Funções de modal
         function openModal(airdrop = null) {
             editingAirdrop = airdrop;
             const modal = document.getElementById('modal');
             const title = document.getElementById('modalTitle');
             const submitBtn = modal.querySelector('button[type="submit"]');
-            
+           
             if (airdrop) {
                 title.textContent = 'Editar Airdrop';
                 submitBtn.textContent = 'Salvar Alterações';
@@ -686,21 +670,18 @@
                 submitBtn.textContent = 'Adicionar Airdrop';
                 resetForm();
             }
-            
+           
             modal.classList.remove('hidden');
         }
-
         function closeModal() {
             document.getElementById('modal').classList.add('hidden');
             editingAirdrop = null;
             resetForm();
         }
-
         function resetForm() {
             const form = document.getElementById('airdropForm');
             form.reset();
         }
-
         function fillForm(airdrop) {
             document.getElementById('nome').value = airdrop.nome;
             document.getElementById('tipo').value = airdrop.tipo;
@@ -714,10 +695,9 @@
             document.getElementById('tarefa').value = airdrop.tarefa;
             document.getElementById('prioridade').value = airdrop.prioridade;
         }
-
         function handleSubmit(e) {
             e.preventDefault();
-            
+           
             const formData = {
                 nome: document.getElementById('nome').value,
                 tipo: document.getElementById('tipo').value,
@@ -733,7 +713,7 @@
                 concluidoHoje: editingAirdrop ? editingAirdrop.concluidoHoje : false,
                 dataConclusao: editingAirdrop ? editingAirdrop.dataConclusao : null
             };
-            
+           
             if (editingAirdrop) {
                 // Editar airdrop existente
                 airdrops = airdrops.map(a => a.id === editingAirdrop.id ? { ...formData, id: editingAirdrop.id } : a);
@@ -741,13 +721,12 @@
                 // Adicionar novo airdrop
                 airdrops.push({ ...formData, id: Date.now() });
             }
-            
+           
             closeModal();
             renderTable();
             updateStats();
             renderCompletedTodaySection();
         }
-
         function deleteAirdrop(id) {
             if (confirm('Tem certeza que deseja excluir este airdrop?')) {
                 airdrops = airdrops.filter(a => a.id !== id);
@@ -756,11 +735,10 @@
                 renderCompletedTodaySection();
             }
         }
-
         // Funções de modal de detalhes
         function openDetailModal(airdrop) {
             selectedAirdrop = airdrop;
-            
+           
             // Preencher dados do modal
             document.getElementById('detailIcon').textContent = airdrop.nome.substring(0, 2).toUpperCase();
             document.getElementById('detailNome').textContent = airdrop.nome;
@@ -777,28 +755,26 @@
             document.getElementById('detailPrioridadeDot').className = `w-2 h-2 rounded-full ${getPrioridadeColor(airdrop.prioridade)}`;
             document.getElementById('detailDescription').textContent = airdrop.description;
             document.getElementById('detailTarefa').textContent = airdrop.tarefa;
-            
+           
             // Configurar botão de visitar site
             document.getElementById('visitSiteBtn').onclick = () => window.open(`https://${airdrop.url}`, '_blank');
-            
+           
             // Configurar botão de editar
             document.getElementById('editDetailBtn').onclick = () => {
                 closeDetailModal();
                 openModal(airdrop);
             };
-            
+           
             // Mostrar/ocultar seções baseado no conteúdo
             document.getElementById('descriptionSection').style.display = airdrop.description ? 'block' : 'none';
             document.getElementById('tasksSection').style.display = airdrop.tarefa ? 'block' : 'none';
-            
+           
             document.getElementById('detailModal').classList.remove('hidden');
         }
-
         function closeDetailModal() {
             document.getElementById('detailModal').classList.add('hidden');
             selectedAirdrop = null;
         }
-
         // Funções de renderização
         function renderTable() {
             const tbody = document.getElementById('airdropsTableBody');
@@ -806,13 +782,13 @@
                 const matchesStatus = filterStatus === 'Todos' || airdrop.status === filterStatus;
                 return matchesStatus;
             });
-            
+           
             tbody.innerHTML = filteredAirdrops.map(airdrop => `
                 <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
                     <td class="p-6 text-center">
                         <label class="flex items-center justify-center cursor-pointer">
-                            <input 
-                                type="checkbox" 
+                            <input
+                                type="checkbox"
                                 class="w-5 h-5 text-green-500 bg-white/10 border-white/20 rounded focus:ring-green-500 focus:ring-2"
                                 ${airdrop.concluidoHoje ? 'checked' : ''}
                                 onchange="toggleCompletedToday(${airdrop.id}, this.checked)"
@@ -879,11 +855,10 @@
                     </td>
                 </tr>
             `).join('');
-            
+           
             // Reinicializar ícones
             lucide.createIcons();
         }
-
         function toggleCompletedToday(id, checked) {
             const airdrop = airdrops.find(a => a.id === id);
             if (airdrop) {
@@ -897,12 +872,11 @@
                 renderCompletedTodaySection();
             }
         }
-
         function renderCompletedTodaySection() {
             const completedToday = airdrops.filter(a => a.concluidoHoje);
             const section = document.getElementById('completedTodaySection');
             const list = document.getElementById('completedTodayList');
-            
+           
             if (completedToday.length > 0) {
                 section.style.display = 'block';
                 list.innerHTML = completedToday.map(airdrop => `
@@ -933,22 +907,20 @@
             } else {
                 section.style.display = 'none';
             }
-            
+           
             // Reinicializar ícones
             lucide.createIcons();
         }
-
         function updateStats() {
             const activeCount = airdrops.filter(a => a.status === 'Ativo').length;
             const completedCount = airdrops.filter(a => a.status === 'Concluído').length;
             const urgentCount = airdrops.filter(a => a.prioridade === 'Alta' && a.status === 'Ativo').length;
             const completedTodayCount = airdrops.filter(a => a.concluidoHoje).length;
-            
+           
             document.getElementById('totalCount').textContent = airdrops.length;
             document.getElementById('urgentCount').textContent = urgentCount;
             document.getElementById('completedTodayCount').textContent = completedTodayCount;
         }
-
         // Funções de Backup e Importação
         function exportBackup() {
             const backupData = {
@@ -956,19 +928,18 @@
                 exportDate: new Date().toISOString(),
                 version: '1.0'
             };
-            
+           
             const dataStr = JSON.stringify(backupData, null, 2);
             const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            
+           
             const link = document.createElement('a');
             link.href = URL.createObjectURL(dataBlob);
             link.download = `airdrop-backup-${new Date().toISOString().split('T')[0]}.json`;
             link.click();
-            
+           
             // Mostrar notificação de sucesso
             showNotification('Backup exportado com sucesso!', 'success');
         }
-
         function openImportModal() {
             document.getElementById('importModal').classList.remove('hidden');
             document.getElementById('importPreview').classList.add('hidden');
@@ -976,30 +947,26 @@
             document.getElementById('importFile').value = '';
             lucide.createIcons();
         }
-
         function closeImportModal() {
             document.getElementById('importModal').classList.add('hidden');
         }
-
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    
+                   
                     // Validar estrutura do arquivo
                     if (!data.airdrops || !Array.isArray(data.airdrops)) {
                         throw new Error('Arquivo inválido: estrutura de dados incorreta');
                     }
-
                     // Mostrar preview
                     const preview = document.getElementById('importPreview');
                     const previewContent = document.getElementById('importPreviewContent');
                     const importButton = document.getElementById('importButton');
-                    
+                   
                     previewContent.innerHTML = `
                         <div class="space-y-2">
                             <div><strong>Total de airdrops:</strong> ${data.airdrops.length}</div>
@@ -1007,61 +974,57 @@
                             <div><strong>Versão:</strong> ${data.version || '1.0'}</div>
                         </div>
                     `;
-                    
+                   
                     preview.classList.remove('hidden');
                     importButton.classList.remove('hidden');
-                    
+                   
                     // Armazenar dados temporariamente
                     window.tempImportData = data;
-                    
+                   
                 } catch (error) {
                     showNotification('Erro ao ler arquivo: ' + error.message, 'error');
                     document.getElementById('importPreview').classList.add('hidden');
                     document.getElementById('importButton').classList.add('hidden');
                 }
             };
-            
+           
             reader.readAsText(file);
         }
-
         function importBackup() {
             if (!window.tempImportData) {
                 showNotification('Nenhum arquivo selecionado', 'error');
                 return;
             }
-
             // Confirmar importação
             if (!confirm('Tem certeza que deseja importar estes dados? Isso substituirá todos os dados atuais.')) {
                 return;
             }
-
             try {
                 // Importar dados
                 airdrops = window.tempImportData.airdrops;
-                
+               
                 // Limpar dados temporários
                 delete window.tempImportData;
-                
+               
                 // Fechar modal
                 closeImportModal();
-                
+               
                 // Atualizar interface
                 renderTable();
                 updateStats();
                 renderCompletedTodaySection();
-                
+               
                 showNotification('Dados importados com sucesso!', 'success');
-                
+               
             } catch (error) {
                 showNotification('Erro ao importar dados: ' + error.message, 'error');
             }
         }
-
         function showNotification(message, type = 'info') {
             // Criar elemento de notificação
             const notification = document.createElement('div');
             notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white font-medium z-50 transition-all duration-300 transform translate-x-full`;
-            
+           
             // Definir cor baseada no tipo
             if (type === 'success') {
                 notification.className += ' bg-green-600';
@@ -1070,17 +1033,17 @@
             } else {
                 notification.className += ' bg-blue-600';
             }
-            
+           
             notification.textContent = message;
-            
+           
             // Adicionar ao DOM
             document.body.appendChild(notification);
-            
+           
             // Animar entrada
             setTimeout(() => {
                 notification.classList.remove('translate-x-full');
             }, 100);
-            
+           
             // Remover após 3 segundos
             setTimeout(() => {
                 notification.classList.add('translate-x-full');
@@ -1093,4 +1056,5 @@
         }
     </script>
 </body>
-</html> 
+</html>
+```
